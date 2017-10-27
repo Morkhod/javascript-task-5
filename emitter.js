@@ -4,8 +4,10 @@
  * Сделано задание на звездочку
  * Реализованы методы several и through
  */
-getEmitter.isStar = true;
+getEmitter.isStar = false;
 module.exports = getEmitter;
+
+var events = [];
 
 /**
  * Возвращает новый emitter
@@ -19,26 +21,45 @@ function getEmitter() {
          * @param {String} event
          * @param {Object} context
          * @param {Function} handler
+         * @returns {Object}
          */
         on: function (event, context, handler) {
-            console.info(event, context, handler);
+            events.push({ event, context, handler });
+
+            return this;
         },
 
         /**
          * Отписаться от события
          * @param {String} event
          * @param {Object} context
+         * @returns {Object}
          */
         off: function (event, context) {
-            console.info(event, context);
+            events = events.filter(ev =>
+                !(ev.context === context && new RegExp(`^${event}.?$`).test(ev.event)));
+
+            return this;
         },
 
         /**
          * Уведомить о событии
          * @param {String} event
+         * @returns {Object}
          */
         emit: function (event) {
-            console.info(event);
+            let split = event.split('.');
+            let regexpArr = [];
+            for (let i = 0; i <= split.length; i++) {
+                regexpArr.push(new RegExp(`^${split.join('.')}$`));
+                split.pop();
+            }
+            events
+                .filter(ev => regexpArr.some(re => re.test(ev.event)))
+                .sort((a, b) => b.event.split('.').length - a.event.split('.').length)
+                .forEach(ev => ev.handler.call(ev.context));
+
+            return this;
         },
 
         /**
