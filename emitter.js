@@ -37,7 +37,8 @@ function getEmitter() {
          */
         off: function (event, context) {
             events = events.filter(ev =>
-                !(ev.context === context && new RegExp(`^${event}.?$`).test(ev.event)));
+                !(ev.context === context &&
+                    (ev.event === event || ev.event.startsWith(event + '.'))));
 
             return this;
         },
