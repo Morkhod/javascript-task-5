@@ -49,13 +49,9 @@ function getEmitter() {
          * @returns {Object}
          */
         emit: function (event) {
-            let split = event.split('.');
-            const len = split.length;
-            let regexpArr = [];
-            for (let i = 0; i <= len; i++) {
-                regexpArr.push(new RegExp(`^${split.join('.')}$`));
-                split.pop();
-            }
+            const split = event.split('.');
+            const regexpArr = split.reduceRight((acc, cur, i) =>
+                (acc.concat(new RegExp(`^${split.slice(0, i + 1).join('.')}$`))), []);
             events
                 .filter(ev => regexpArr.some(re => re.test(ev.event)))
                 .sort((a, b) => b.event.split('.').length - a.event.split('.').length)
