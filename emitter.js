@@ -50,8 +50,9 @@ function getEmitter() {
          */
         emit: function (event) {
             let split = event.split('.');
+            const len = split.length;
             let regexpArr = [];
-            for (let i = 0; i <= split.length; i++) {
+            for (let i = 0; i <= len; i++) {
                 regexpArr.push(new RegExp(`^${split.join('.')}$`));
                 split.pop();
             }
